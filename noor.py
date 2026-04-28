@@ -15,7 +15,7 @@ def chat(message):
 
 while True:
     user_input = input("You: ")
-    if user_input.lower == "quit":
+    if user_input.lower() == "quit":
         break
     response = chat(user_input)
     print(f"Noor: {response}\n")
