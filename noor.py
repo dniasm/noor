@@ -1,12 +1,9 @@
+from memory.history_store import load_history, save_history, append_exchange
 import requests
 import json
 import os
 
-if os.path.exists("memory.json"):
-    with open("memory.json","r") as f:
-        conversation_history = json.load(f)
-else:
-    conversation_history = []
+conversation_history = load_history()
 
 system = """You are Noor, a personal AI assistant.
 You must follow these rules strictly:
@@ -30,10 +27,7 @@ You must follow these rules strictly:
 you can help with coding, academic topics, security concepts and general assistance."""
 
 def chat(message):
-    conversation_history.append({
-        "role" : "user",
-        "content" : message
-    })
+    append_exchange(conversation_history, "user", message)
 
     full_prompt = f"System: {system}\n"
 
@@ -53,18 +47,14 @@ def chat(message):
     )
 
     reply = json.loads(response.text)["response"]
-    conversation_history.append({
-        "role" : "assistant",
-        "content" : reply
-    })
+    append_exchange(conversation_history, "assistant", reply)
 
     return reply
 
 while True:
     user_input = input("You: ")
     if "quit" in user_input.strip().lower():
-        with open("memory.json","w") as f:
-            json.dump(conversation_history, f, indent=2)
+        save_history(conversation_history)
         print("Goodbye.")
         break
     response = chat(user_input)
