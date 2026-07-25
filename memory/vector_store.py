@@ -1,0 +1,55 @@
+import requests
+import os
+from dotenv import load_dotenv
+import psycopg2
+
+load_dotenv()
+password = os.environ.get("DB_PASSWORD")
+
+def get_embeddings(texts):
+    response = requests.post(
+        "http://localhost:11434/api/embed",
+        json={
+            "model" : "nomic-embed-text",
+            "input" : texts
+        }
+    )
+    return response.json()["embeddings"]
+
+def get_connection():
+    return psycopg2.connect(
+        host = "localhost",
+        port = 5432,
+        dbname = "postgres",
+        user = "postgres",
+        password = password
+    )
+
+def add_exchange(user_query, assistant_response):
+    embeddings = get_embeddings([user_query, assistant_response])
+    query_embedding, response_embedding = embeddings
+
+    if not is_valid_embedding(query_embedding) or not is_valid_embedding(response_embedding):
+        embeddings = get_embeddings([user_query, assistant_response])
+        query_embedding, response_embedding = embeddings
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        INSERT INTO conversation_memory
+        (user_query, assistant_response, query_embedding, response_embedding)
+        VALUES (%s,%s,%s,%s)
+        """,
+        (user_query, assistant_response, query_embedding, response_embedding)
+    )
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+def is_valid_embedding(vector , expected_dim = 768):
+    if len(vector) != expected_dim:
+        return False
+    return any(value != 0 for value in vector)
