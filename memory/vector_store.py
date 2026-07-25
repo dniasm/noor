@@ -49,6 +49,28 @@ def add_exchange(user_query, assistant_response):
     cursor.close()
     conn.close()
 
+def get_relevant_context(message, top_k = 3):
+    query_embedding = get_embeddings([message])[0]
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT user_query, assistant_response
+        FROM conversation_memory
+        ORDER BY query_embedding <=> %s
+        LIMIT %s;
+        """,
+        (str(query_embedding),top_k)
+    )
+
+    results = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return results
+
 def is_valid_embedding(vector , expected_dim = 768):
     if len(vector) != expected_dim:
         return False
