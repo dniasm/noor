@@ -2,6 +2,8 @@ import requests
 import os
 from dotenv import load_dotenv
 import psycopg2
+from pgvector.psycopg2 import register_vector
+
 
 load_dotenv()
 password = os.environ.get("DB_PASSWORD")
@@ -17,13 +19,15 @@ def get_embeddings(texts):
     return response.json()["embeddings"]
 
 def get_connection():
-    return psycopg2.connect(
+    conn = psycopg2.connect(
         host = "localhost",
         port = 5432,
         dbname = "postgres",
         user = "postgres",
         password = password
     )
+    register_vector(conn)
+    return conn
 
 def add_exchange(user_query, assistant_response):
     embeddings = get_embeddings([user_query, assistant_response])
@@ -59,10 +63,10 @@ def get_relevant_context(message, top_k = 3):
         """
         SELECT user_query, assistant_response
         FROM conversation_memory
-        ORDER BY query_embedding <=> %s
+        ORDER BY query_embedding <=> %s :: vector
         LIMIT %s;
         """,
-        (str(query_embedding),top_k)
+        (query_embedding,top_k)
     )
 
     results = cursor.fetchall()
