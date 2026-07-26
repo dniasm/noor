@@ -1,4 +1,5 @@
 from memory.history_store import load_history, save_history, append_exchange
+from memory.vector_store import add_exchange, get_relevant_context
 import requests
 import json
 import os
@@ -29,7 +30,15 @@ you can help with coding, academic topics, security concepts and general assista
 def chat(message):
     append_exchange(conversation_history, "user", message)
 
+    relevant_context = get_relevant_context(message)
+
     full_prompt = f"System: {system}\n"
+
+    if relevant_context:
+        full_prompt += "Relevant context from earlier conversations:\n"
+        for past_query, past_reponse in relevant_context:
+            full_prompt += f"User previously asked: {past_query}\n Noor previously replied {past_reponse}\n"
+        full_prompt += "\n"
 
     for entry in conversation_history:
         if entry["role"] == "user":
@@ -48,6 +57,8 @@ def chat(message):
 
     reply = json.loads(response.text)["response"]
     append_exchange(conversation_history, "assistant", reply)
+
+    add_exchange(message, reply)
 
     return reply
 
