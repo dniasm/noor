@@ -246,5 +246,21 @@
   {
     "role": "assistant",
     "content": " Hello there! How can I assist you today? If you have any questions or need help with anything, feel free to ask!"
+  },
+  {
+    "role": "user",
+    "content": "hi"
+  },
+  {
+    "role": "assistant",
+    "content": " Hello! How can I assist you today? If you have any questions or need help with anything, feel free to ask!"
+  },
+  {
+    "role": "user",
+    "content": "are you alright?"
+  },
+  {
+    "role": "assistant",
+    "content": " Yes, I'm functioning as intended. How can I assist you today? If you have any questions or need help with anything, please don't hesitate to ask!"
   }
 ]
