@@ -1,9 +1,12 @@
 import json
+import os
 import requests
+
+OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11343")
 
 def generate_reply(prompt):
     response = requests.post(
-        "http://localhost:11434/api/generate",
+        f"{OLLAMA_HOST}/api/generate",
         json = {
             "model" : "mistral",
             "prompt" : prompt,

@@ -7,10 +7,12 @@ from pgvector.psycopg2 import register_vector
 
 load_dotenv()
 password = os.environ.get("DB_PASSWORD")
+db_host = os.environ.get("DB_HOST", "localhost")
+ollama_host = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
 
 def get_embeddings(texts):
     response = requests.post(
-        "http://localhost:11434/api/embed",
+        f"{ollama_host}/api/embed",
         json={
             "model" : "nomic-embed-text",
             "input" : texts
@@ -20,7 +22,7 @@ def get_embeddings(texts):
 
 def get_connection():
     conn = psycopg2.connect(
-        host = "localhost",
+        host = db_host,
         port = 5432,
         dbname = "postgres",
         user = "postgres",
