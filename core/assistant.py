@@ -18,7 +18,7 @@ def chat(message):
             full_prompt += f"User previously asked: {past_query}\n Noor previously replied {past_reponse}\n"
         full_prompt += "\n"
 
-    for entry in conversation_history:
+    for entry in conversation_history[-6:]:
         if entry["role"] == "user":
             full_prompt += f"User: {entry['content']}\n"
         else:
