@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  
+  noor:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: postgres
+      OLLAMA_HOST: http://host.docker.internal:11434
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
