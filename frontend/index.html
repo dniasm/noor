@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white h-screen flex flex-col">
+    <header class="p-4 border-b border-gray-700">
+        <h1 class="text-xl font-semibold">Noor</h1>
+    </header>
+
+    <div id="chat-log" class="flex-1 overflow-y-auto p-4 space-y-3">
+
+    </div>
+
+    <form id="chat-form" class="p-4 border-t border-gray-700 flex gap-2">
+        <input id="message-input" type="text" placeholder="Type a Message for Noor" class="flex-1 bg-gray-800 rounded px-3 py-2 outline-none" />
+        <button type="submit" class="bg-blue-600 px-3 py-2 rounded">Send</button>
+    </form>
+
+    <script>
+        document.getElementById("chat-form").addEventListener("submit", async function(event){
+            event.preventDefault();
+
+            const input = document.getElementById("message-input");
+            const message = input.value;
+
+            const response = await fetch("http://localhost:8000/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ message: message })
+            });
+
+            const data = await response.json();
+
+            const chatLog = document.getElementById("chat-log");
+            chatLog.innerHTML += `<div class="text-right"><span class="bg-blue-600 px-3 py-2 rounded inline-block">${message}</span></div>`;
+            chatLog.innerHTML += `<div class="text-left"><span class="bg-gray-700 px-3 py-2 rounded inline-block">${data.reply}</span></div>`;
+
+            input.value = "";
+        });
+    </script>
+    
+</body>
+</html>
